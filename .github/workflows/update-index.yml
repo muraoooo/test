@@ -4,13 +4,16 @@ on:
   push:
     paths:
       - '*.html'
+      - '!index.html'
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -18,15 +21,15 @@ jobs:
           node-version: '18'
 
       - name: Install dependencies
-        run: npm install || true
+        run: npm install
 
       - name: Generate index.html
-        run: node generate_index.js
+        run: npm run generate
 
-      - name: Commit and push updated index.html
+      - name: Commit and push changes
         run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add index.html
-          git commit -m "🔄 Auto-update index.html"
+          git commit -m 'Auto-update index.html'
           git push
