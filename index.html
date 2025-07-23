@@ -1,31 +1,14 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>学習HTMLメモ一覧</title>
+  <title>📘 HTMLメモ一覧（自動生成）</title>
 </head>
 <body>
-  <h1>📘 メモ一覧（自動リンク）</h1>
-  <ul id="fileList"></ul>
-
-  <script>
-    // 表示したいファイル名をここに記述（GitHubで管理するか、Netlify FunctionsでもOK）
-    const files = [
-      "llm_01.html",
-      "llm_02.html",
-      "llm_world_model_research.html"
-      // ← この配列にファイルを追加していくだけ！
-    ];
-
-    const list = document.getElementById("fileList");
-    files.forEach(filename => {
-      const li = document.createElement("li");
-      const link = document.createElement("a");
-      link.href = filename;
-      link.textContent = filename;
-      li.appendChild(link);
-      list.appendChild(li);
-    });
-  </script>
+  <h1>📘 HTMLメモ一覧（自動生成）</h1>
+  <ul>
+    <li><a href="ai_image_generation_seminar_summary.html">ai_image_generation_seminar_summary.html</a></li>
+    <li><a href="llm_world_model_research (1) (1).html">llm_world_model_research (1) (1).html</a></li>
+  </ul>
 </body>
 </html>
