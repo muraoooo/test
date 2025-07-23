@@ -21,4 +21,4 @@ const html = `<!DOCTYPE html>
 </html>`;
 
 fs.writeFileSync(outputFile, html);
-console.log(\`✅ index.html generated with \${files.length} entries.\`);
+console.log(`✅ index.html generated with ${files.length} entries.`);
