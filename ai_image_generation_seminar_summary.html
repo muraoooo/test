@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI画像生成セミナー概要 - プロの視点から学ぶ効果的な画像生成術</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        mermaid.initialize({
+          startOnLoad: true,
+          theme: 'base',
+          securityLevel: 'loose',
+          fontFamily: 'sans-serif',
+          themeVariables: {
+            primaryColor: '#4CAF50',
+            primaryTextColor: '#fff',
+            primaryBorderColor: '#9575CD',
+            lineColor: '#009688',
+            secondaryColor: '#FFC107',
+            tertiaryColor: '#f0f0f0'
+          },
+          flowchart: {
+            curve: 'basis'
+          }
+        });
+      });
+    </script>
+    
+    <style>
+    :root {
+      --main-color: #4CAF50;
+      --accent-color-1: #9575CD;
+      --accent-color-2: #FFC107;
+      --accent-color-3: #009688;
+      --accent-color-4: #E91E63;
+      --background-color: #FAFAFA;
+      --text-color: #333;
+      --light-text-color: #FFF;
+      --border-color: #E0E0E0;
+    }
+    body {
+      font-family: sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      border-radius: 8px;
+    }
+    h1, h2, h3, h4 { color: var(--main-color); margin-bottom: 0.8em; }
+    h1 { font-size: 2.2em; text-align: center; border-bottom: 2px solid var(--accent-color-2); padding-bottom: 10px; }
+    h2 { font-size: 1.8em; color: var(--accent-color-3); border-left: 5px solid var(--accent-color-3); padding-left: 10px; margin-top: 2em;}
+    h3 { font-size: 1.4em; color: var(--accent-color-1); margin-top: 1.5em; }
+    strong { color: var(--accent-color-4); }
+    ul, ol { padding-left: 25px; }
+    li { margin-bottom: 0.5em; }
+    p { margin-bottom: 1em; }
+    .hero-section {
+        background-color: var(--main-color);
+        color: var(--light-text-color);
+        padding: 30px;
+        text-align: center;
+        border-radius: 8px 8px 0 0;
+    }
+    .hero-section h1 { color: var(--light-text-color); border-bottom: none; }
+    .hero-section p { font-size: 1.1em; }
+    .benefits-section ul li::before {
+        content: '✅ ';
+        color: var(--main-color);
+        font-weight: bold;
+        display: inline-block;
+        width: 1em;
+        margin-left: -1em;
+    }
+    .process-section ol {
+      list-style: none;
+      counter-reset: step-counter;
+      padding-left: 0;
+    }
+    .process-section li {
+      counter-increment: step-counter;
+      margin-bottom: 1em;
+      position: relative;
+      padding-left: 40px;
+    }
+    .process-section li::before {
+      content: counter(step-counter);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 30px;
+      height: 30px;
+      background-color: var(--accent-color-2);
+      color: var(--text-color);
+      border-radius: 50%;
+      text-align: center;
+      line-height: 30px;
+      font-weight: bold;
+    }
+    .quote {
+      background-color: #f0f0f0;
+      border-left: 5px solid var(--accent-color-1);
+      padding: 15px;
+      margin: 15px 0;
+      font-style: italic;
+    }
+    .faq-section dt {
+        font-weight: bold;
+        color: var(--accent-color-3);
+        margin-top: 1em;
+    }
+    .faq-section dd {
+        margin-left: 1.5em;
+        margin-bottom: 1em;
+    }
+    .mermaid {
+      margin-bottom: 1.5em;
+      text-align: center;
+    }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+  <section class="hero-section">
+    <h1>💡 プロカメラマンが教える AI画像生成の新常識</h1>
+    <p>写真の専門知識を活用して、<strong>効果的なプロンプト</strong>で理想の画像を生成する方法</p>
+    <p>🎯 「無駄なプロンプト」から卒業し、<em>本当に効くテクニック</em>を身につけよう</p>
+  </section>
+
+  <section class="benefits-section">
+    <h2>🎯 この内容から得られること</h2>
+    <h3>主な学習内容 / トピック</h3>
+    <ul>
+      <li><strong>効果的なプロンプトと効果のないプロンプトの違い</strong> - 無駄な記述を削ぎ落とす方法</li>
+      <li><strong>写真・カメラの専門知識を活用した画像生成術</strong> - プロの視点からのアプローチ</li>
+      <li><strong>Midjourneyでの実践的なテクニック</strong> - 実際に使える具体的な手法</li>
+      <li><strong>AI画像生成の限界と課題</strong> - 学習データに含まれていない要素の理解</li>
+      <li><strong>数値に頼らない画像生成の考え方</strong> - より自然で効果的なアプローチ</li>
+    </ul>
+    <h3>💡 具体的にできるようになること / 成果</h3>
+    <ul>
+      <li><strong>プロンプトの無駄を削減</strong>し、より精度の高い画像生成が可能に</li>
+      <li><strong>写真と見間違えるような高品質な画像</strong>を安定して生成</li>
+      <li><strong>カメラの知識を活用</strong>した、より専門的で説得力のある画像制作</li>
+      <li><strong>効率的な画像生成ワークフロー</strong>を構築し、時間短縮を実現</li>
+      <li><strong>AI画像生成の本質的な理解</strong>に基づいた戦略的なアプローチ</li>
+    </ul>
+    <h3>✨ 期待される変化 / ポジティブな影響</h3>
+    <p><strong style="color: var(--accent-color-4);">「目からうろこ」の体験</strong>を通じて、これまで手探りで行っていた画像生成が、<em>論理的で効率的なプロセス</em>に変わります。プロのカメラマンが培った専門知識により、<strong>一生知らないままだった貴重なテクニック</strong>を習得し、画像生成のクオリティが劇的に向上します。</p>
+  </section>
+
+  <section class="proof-section">
+    <h2>💬 内容の根拠 / 具体例</h2>
+    <p>参加者の実際の体験談が、このセミナーの価値を物語っています：</p>
+    
+    <div class="quote">
+      <p><strong>"Midjourneyを毎日さわっているのですが、無駄なプロンプトを書いていたことが衝撃でした"</strong></p>
+      <p><em>- 40代会社員参加者</em></p>
+    </div>
+    
+    <div class="quote">
+      <p><strong>"ChatGPTに出してもらったプロンプトを何も考えずに使っていました！とても勉強になりました"</strong></p>
+      <p><em>- 40代個人事業主参加者</em></p>
+    </div>
+    
+    <div class="quote">
+      <p><strong>"写真の画像生成は数値が重要かと思っていました。今日はそれを教えていただけて納得の解説"</strong></p>
+      <p><em>- 50代会社員参加者</em></p>
+    </div>
+
+    <pre class="mermaid">
+      graph TD
+          A[従来のアプローチ] --> B{数値重視のプロンプト}
+          A --> C{ChatGPT生成のプロンプト}
+          A --> D{無駄な記述の多用}
+          
+          E[プロの新アプローチ] --> F{写真理論に基づく記述}
+          E --> G{効果的な要素の選別}
+          E --> H{簡潔で的確な表現}
+          
+          B --> I[期待通りの結果が出ない]
+          C --> I
+          D --> I
+          
+          F --> J[高品質な画像生成]
+          G --> J
+          H --> J
+          
+          style A fill:#ffcccc
+          style E fill:#ccffcc
+          style I fill:#ffcccc
+          style J fill:#ccffcc
+    </pre>
+  </section>
+
+  <section class="process-section">
+    <h2>➡️ 詳細なプロセス / 手順</h2>
+    <h3>具体的なステップ</h3>
+    <ol>
+      <li><strong>現在のプロンプトの問題点を特定:</strong> 無駄な記述や効果のない要素を洗い出し</li>
+      <li><strong>写真理論の基礎理解:</strong> カメラの専門知識をプロンプトに活用する方法を学習</li>
+      <li><strong>効果的なプロンプト構築:</strong> 簡潔で的確な表現による高品質画像生成</li>
+      <li><strong>AI学習データの理解:</strong> 生成可能な要素と限界を把握した戦略的アプローチ</li>
+      <li><strong>実践とブラッシュアップ:</strong> 継続的な改善による画像生成スキルの向上</li>
+    </ol>
+    
+    <pre class="mermaid">
+      graph TD
+          Start[画像生成への取り組み開始] --> Analysis[現在のプロンプト分析]
+          Analysis --> Learning[写真理論の習得]
+          Learning --> Practice[効果的プロンプトの実践]
+          Practice --> Understanding[AI限界の理解]
+          Understanding --> Mastery[画像生成マスタリー]
+          
+          Analysis --> Waste{無駄な記述発見}
+          Learning --> Knowledge{専門知識活用}
+          Practice --> Quality{高品質画像生成}
+          Understanding --> Strategy{戦略的アプローチ}
+          
+          style Start fill:#e1f5fe
+          style Mastery fill:#c8e6c9
+          style Waste fill:#ffcdd2
+          style Knowledge fill:#fff9c4
+          style Quality fill:#c8e6c9
+          style Strategy fill:#d1c4e9
+    </pre>
+  </section>
+
+  <section class="faq-section">
+    <h2>❓ 想定される疑問点 (Q&A)</h2>
+    <dl>
+      <dt>Q1: 今まで使っていたプロンプトは本当に無駄だったのですか？</dt>
+      <dd>A1: 多くの参加者が「無駄なプロンプトを書いていた」と実感しており、特に数値重視や複雑すぎる記述は効果が限定的です。<strong>プロの知識に基づいた簡潔なアプローチ</strong>の方が確実に良い結果を生みます。</dd>
+      
+      <dt>Q2: カメラの知識がない初心者でも理解できますか？</dt>
+      <dd>A2: はい、<strong>初心者向けの内容も含まれており</strong>、「写真のことはほぼ知らない」参加者も「貴重な勉強になった」と感想を述べています。専門知識を分かりやすく応用する方法を学べます。</dd>
+      
+      <dt>Q3: AI画像生成にはどのような限界がありますか？</dt>
+      <dd>A3: <strong>学習時にトレーニングされていない要素</strong>は生成が困難であり、この理解が効果的なプロンプト作成の鍵となります。写真の専門家だからこそ分かる課題と対処法を学べます。</dd>
+      
+      <dt>Q4: この知識はMidjourney以外でも活用できますか？</dt>
+      <dd>A4: はい、<strong>写真理論に基づいたアプローチ</strong>は、あらゆるAI画像生成ツールに応用可能です。本質的な理解により、新しいツールにも対応できる力が身につきます。</dd>
+    </dl>
+  </section>
+
+</div>
+
+</body>
+</html>
