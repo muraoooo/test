@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLMの世界モデル理解 - 機能的バイアスプローブによる探究</title>
+    
+    <!-- Mermaid.js の読み込み -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            mermaid.initialize({
+                startOnLoad: true,
+                theme: 'base',
+                securityLevel: 'loose',
+                fontFamily: '"Kaisei Decol", sans-serif',
+                themeVariables: {
+                    primaryColor: '#4CAF50',
+                    primaryTextColor: '#fff',
+                    primaryBorderColor: '#9575CD',
+                    lineColor: '#009688',
+                    secondaryColor: '#FFC107',
+                    tertiaryColor: '#E91E63'
+                },
+                flowchart: {
+                    cornerRadius: 15,
+                    curve: 'cardinal',
+                    htmlLabels: true
+                }
+            });
+        });
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
+            line-height: 1.8;
+            background: linear-gradient(135deg, #FAFAFA 0%, #F5F5F5 100%);
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            background: linear-gradient(135deg, #4CAF50, #009688);
+            color: white;
+            padding: 40px 20px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(76, 175, 80, 0.3);
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .section {
+            background: white;
+            margin: 30px 0;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        
+        .section:hover {
+            transform: translateY(-5px);
+        }
+        
+        .section-header {
+            background: linear-gradient(135deg, #9575CD, #E91E63);
+            color: white;
+            padding: 20px 30px;
+            position: relative;
+        }
+        
+        .section-header::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 5px;
+            height: 100%;
+            background: #FFC107;
+        }
+        
+        .section-title {
+            font-size: 1.8em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .icon {
+            width: 40px;
+            height: 40px;
+            background: #FFC107;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+        }
+        
+        .section-content {
+            padding: 30px;
+        }
+        
+        .conclusion {
+            background: linear-gradient(135deg, #4CAF50, #009688);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #FFC107;
+        }
+        
+        .background {
+            background: #F5F5F5;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 5px solid #9575CD;
+        }
+        
+        .example {
+            background: #E3F2FD;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 5px solid #009688;
+        }
+        
+        .analogy {
+            background: #FFF3E0;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 5px solid #E91E63;
+        }
+        
+        .highlight {
+            background: linear-gradient(135deg, #FFC107, #FF9800);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .flow-chart {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .comparison-table th {
+            background: linear-gradient(135deg, #4CAF50, #009688);
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+        
+        .comparison-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .comparison-table tr:nth-child(even) {
+            background: #F5F5F5;
+        }
+        
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: #4CAF50;
+            transform: translateX(-50%);
+        }
+        
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin: 30px 0;
+            position: relative;
+        }
+        
+        .timeline-content {
+            flex: 1;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin: 0 20px;
+        }
+        
+        .timeline-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #FFC107, #FF9800);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5em;
+            font-weight: bold;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 LLMの世界モデル理解</h1>
+            <div class="subtitle">機能的バイアスプローブによる基盤モデルの探究</div>
+        </div>
+
+        <!-- 研究概要 -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">
+                    <div class="icon">🎯</div>
+                    研究概要と核心的発見
+                </div>
+            </div>
+            <div class="section-content">
+                <div class="conclusion">
+                    <strong>🎯 核心的結論：</strong> LLMは高精度な予測を行えるが、その背後にある根本的な世界モデル（物理法則など）は理解していない
+                </div>
+                
+                <div class="background">
+                    <h3>🔍 研究背景</h3>
+                    <p>ハーバード大学とMITの共同研究により、基盤モデル（LLM）が予測タスクにおいて高い性能を示す一方で、その予測の根拠となる深い構造や法則を本当に理解しているかは不明であった。</p>
+                </div>
+                
+                <div class="example">
+                    <h3>💫 具体例：惑星軌道予測実験</h3>
+                    <p>トランスフォーマーモデルに惑星の軌道を予測させる実験を実施。結果として<span class="highlight">R² = 0.999</span>という極めて高い精度を達成したが、ニュートンの運動方程式や万有引力の法則は理解していないことが判明。</p>
+                </div>
+                
+                <div class="analogy">
+                    <h3>⚾ 例え話：野球選手の予測能力</h3>
+                    <p>野球の外野手がボールの軌道を瞬時に予測して適切な位置に移動する能力と似ている。選手はニュートン力学の計算をしているわけではなく、経験に基づく直感的予測を行っている。LLMも同様の「直感的予測」を行っている可能性がある。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 歴史的比較 -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">
+                    <div class="icon">📚</div>
+                    歴史的比較：ケプラーとニュートン
+                </div>
+            </div>
+            <div class="section-content">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-icon">K</div>
+                        <div class="timeline-content">
+                            <h3>ケプラーの法則（1609-1619年）</h3>
+                            <p><strong>能力：</strong> 惑星軌道の正確な予測<br>
+                            <strong>限界：</strong> なぜそうなるかの根本原理は不明</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-icon">N</div>
+                        <div class="timeline-content">
+                            <h3>ニュートンの力学（1687年）</h3>
+                            <p><strong>革新：</strong> 万有引力の法則と運動方程式<br>
+                            <strong>意義：</strong> ケプラーの法則の根本原理を解明</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="conclusion">
+                    <strong>🎯 歴史的教訓：</strong> 予測能力と根本理解は別の段階。ケプラーも優秀な予測ができたが、ニュートンによって初めて根本原理が明らかになった。
+                </div>
+            </div>
+        </div>
+
+        <!-- 機能的バイアスプローブ -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">
+                    <div class="icon">🔬</div>
+                    機能的バイアスプローブ手法
+                </div>
+            </div>
+            <div class="section-content">
+                <div class="conclusion">
+                    <strong>🎯 手法の核心：</strong> LLMが真の世界モデルを学習しているかを、限られたデータからの外挿能力で評価する
+                </div>
+                
+                <div class="background">
+                    <h3>🧮 機能的バイアスとは</h3>
+                    <p>学習アルゴリズムが限られたデータから新しい入力に対して外挿を行う際、特定の種類の関数を学習する傾向のこと。これにより、モデルの内部的な「世界観」を推測できる。</p>
+                </div>
+                
+                <div class="flow-chart">
+                    <div class="mermaid">
+                        graph TD
+                            A[トレーニングデータ] --> B[LLM学習]
+                            B --> C[予測タスク実行]
+                            C --> D{高精度な予測？}
+                            D -->|Yes| E[機能的バイアス分析]
+                            E --> F{真の世界モデル<br/>と一致？}
+                            F -->|Yes| G[🎉 世界モデル理解]
+                            F -->|No| H[⚠️ 表面的パターン学習]
+                            
+                            style A fill:#4CAF50,stroke:#333,color:#fff
+                            style G fill:#009688,stroke:#333,color:#fff
+                            style H fill:#E91E63,stroke:#333,color:#fff
+                    </div>
+                </div>
+                
+                <div class="example">
+                    <h3>🔍 実験設定の詳細</h3>
+                    <p>同じ状態にマッピングされる異なる入力に対して、LLMが同じ予測出力を持つ傾向を測定。真の世界モデルを持っていれば、物理的に同等な状況では同様の予測をするはず。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 実験結果と発見 -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">
+                    <div class="icon">📊</div>
+                    実験結果と重要な発見
+                </div>
+            </div>
+            <div class="section-content">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>評価項目</th>
+                            <th>LLMの性能</th>
+                            <th>解釈</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>軌道予測精度</td>
+                            <td><span class="highlight">R² = 0.999</span></td>
+                            <td>極めて高精度な予測能力</td>
+                        </tr>
+                        <tr>
+                            <td>ニュートン力学への適合</td>
+                            <td><span style="color: #E91E63;">低スコア</span></td>
+                            <td>根本的物理法則は理解していない</td>
+                        </tr>
+                        <tr>
+                            <td>力の方向予測</td>
+                            <td><span style="color: #E91E63;">不正確</span></td>
+                            <td>重力の向きを正しく理解していない</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="conclusion">
+                    <strong>🎯 重要な発見：</strong> 高い予測精度と深い理解は必ずしも同等ではない。LLMは「見かけ上の理解」で優秀な結果を出している。
+                </div>
+                
+                <div class="example">
+                    <h3>🌍 重力の方向に関する誤解</h3>
+                    <p>惑星が太陽の周りを回る軌道において、重力は常に太陽の方向を向くべきだが、LLMは全く異なる方向を示した。これは根本的な物理法則の理解不足を示している。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 知識と実践の乖離 -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">
+                    <div class="icon">🤔</div>
+                    知識と実践の興味深い乖離
+                </div>
+            </div>
+            <div class="section-content">
+                <div class="conclusion">
+                    <strong>🎯 驚くべき現象：</strong> LLMはニュートンの法則を「知識として知っている」が、実際の推論では使用していない
+                </div>
+                
+                <div class="background">
+                    <h3>📚 知識レベルでの理解</h3>
+                    <p>「ニュートンの運動方程式とは何ですか？」と質問すると、LLMは正確な答えを返す。万有引力の法則についても同様に正しい説明ができる。</p>
+                </div>
+                
+                <div class="example">
+                    <h3>🧮 掛け算の例での類似現象</h3>
+                    <p>2桁×2桁の掛け算において、LLMは正確な答えを出すが、人間が学校で習う標準的なアルゴリズムとは全く異なる方法を内部で使用している。掛け算の方法を聞けば正しい手順を答えるが、実際には使っていない。</p>
+                </div>
+                
+                <div class="analogy">
+                    <h3>🎭 二重人格のような現象</h3>
+                    <p>LLMには「理論的知識を持つ人格」と「実際の推論を行う人格」が存在するかのよう。前者は教科書的な正解を知っているが、後者は独自の方法で問題を解決している。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 人間との比較 -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">
+                    <div class="icon">👥</div>
+                    人間の知能との比較考察
+                </div>
+            </div>
+            <div class="section-content">
+                <div class="flow-chart">
+                    <div class="mermaid">
+                        graph LR
+                            subgraph "人間の学習プロセス"
+                            A1[初期理解] --> A2[練習・反復]
+                            A2 --> A3[深い理解]
+                            A3 --> A4[応用・創造]
+                            end
+                            
+                            subgraph "LLMの学習プロセス"
+                            B1[大量データ学習] --> B2[パターン認識]
+                            B2 --> B3[高精度予測]
+                            B3 --> B4[根本理解は？]
+                            end
+                            
+                            style A3 fill:#4CAF50,stroke:#333,color:#fff
+                            style B4 fill:#E91E63,stroke:#333,color:#fff
+                    </div>
+                </div>
+                
+                <div class="conclusion">
+                    <strong>🎯 共通点と相違点：</strong> 人間もLLMも実は似たような「直感的推論」を行うが、人間は意識的に原理を学び適用できる点が異なる
+                </div>
+                
+                <div class="background">
+                    <h3>🧠 人間の直感的理解</h3>
+                    <p>人間も多くの場合、物理の方程式を意識的に計算せずに直感的な予測を行う。例えば、ボールを投げる際に放物線の方程式を解いているわけではない。</p>
+                </div>
+                
+                <div class="example">
+                    <h3>🎯 意識的適用の能力</h3>
+                    <p>人間の優位性は、必要に応じて理論的知識を意識的に呼び出し、新しい状況に適用できる点にある。LLMは知識を「知っている」が、それを適切に「使う」ことができない。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 今後の展望 -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">
+                    <div class="icon">🚀</div>
+                    研究の意義と今後の展望
+                </div>
+            </div>
+            <div class="section-content">
+                <div class="conclusion">
+                    <strong>🎯 最終的な洞察：</strong> 「予測能力 ≠ 理解力」であり、真のAI発展には根本的理解メカニズムの解明が必要
+                </div>
+                
+                <div class="background">
+                    <h3>🔬 更なる検証の必要性</h3>
+                    <p>この研究は小規模なモデルで行われた。GPT-4のような大規模モデルでも同様の現象が見られるかは、今後の重要な研究課題である。</p>
+                </div>
+                
+                <div class="example">
+                    <h3>🎪 科学的発見への道筋</h3>
+                    <p>次の段階として、「ケプラーの法則からニュートンの方程式を導出できるか」という実験が計画されている。これはLLMが真の科学的発見能力を持つかを測る重要なテストとなる。</p>
+                </div>
+                
+                <div class="analogy">
+                    <h3>🌱 知能の本質への問い</h3>
+                    <p>この研究は「知能とは何か」という根本的な問いを提起している。表面的な性能の高さと深い理解の違いを明確にし、真の人工知能開発の方向性を示している。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
