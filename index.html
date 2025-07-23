@@ -2,10 +2,30 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>My GitHub Page</title>
+  <title>学習HTMLメモ一覧</title>
 </head>
 <body>
-  <h1>こんにちは！GitHub Pagesへようこそ 🎉</h1>
-  <p>これはテストページです。</p>
+  <h1>📘 メモ一覧（自動リンク）</h1>
+  <ul id="fileList"></ul>
+
+  <script>
+    // 表示したいファイル名をここに記述（GitHubで管理するか、Netlify FunctionsでもOK）
+    const files = [
+      "llm_01.html",
+      "llm_02.html",
+      "llm_world_model_research.html"
+      // ← この配列にファイルを追加していくだけ！
+    ];
+
+    const list = document.getElementById("fileList");
+    files.forEach(filename => {
+      const li = document.createElement("li");
+      const link = document.createElement("a");
+      link.href = filename;
+      link.textContent = filename;
+      li.appendChild(link);
+      list.appendChild(li);
+    });
+  </script>
 </body>
 </html>
