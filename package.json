@@ -1,0 +1,11 @@
+{
+  "name": "html-index-generator",
+  "version": "1.0.0",
+  "description": "自動でindex.htmlを生成する",
+  "main": "generate_index.js",
+  "scripts": {
+    "generate": "node generate_index.js"
+  },
+  "author": "muraoooo",
+  "license": "MIT"
+}
