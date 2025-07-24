@@ -1,34 +1,32 @@
-name: Generate index.html
+name: Update index.html automatically
 
 on:
   push:
     paths:
       - '*.html'
-      - '!index.html'
+      - 'generate_index.js'
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
+      - name: チェックアウト
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
+      - name: Node.js をセットアップ
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run index generator
+      - name: `generate_index.js` を実行して index.html を再生成
         run: node generate_index.js
 
-      - name: Commit and push changes
+      - name: index.html をコミット＆push
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add index.html
-          git commit -m "chore: auto-update index.html"
+          git commit -m '🔁 auto-generate index.html'
           git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
