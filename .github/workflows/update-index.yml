@@ -18,7 +18,7 @@ jobs:
         with:
           node-version: 20
 
-      - name: `generate_index.js` を実行して index.html を再生成
+      - name: generate_index.js を実行して index.html を再生成
         run: node generate_index.js
 
       - name: index.html をコミット＆push
