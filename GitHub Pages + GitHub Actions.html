@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitHub Pages + GitHub Actions 自動インデックス完全攻略ガイド</title>
+  
+  <!-- Mermaid.js の読み込み -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: 'base',
+        securityLevel: 'loose',
+        fontFamily: '"Arial", sans-serif',
+        themeVariables: {
+          primaryColor: '#4CAF50',
+          primaryTextColor: '#fff',
+          primaryBorderColor: '#009688',
+          lineColor: '#009688',
+          secondaryColor: '#FFC107',
+          tertiaryColor: '#FAFAFA'
+        },
+        flowchart: {
+          cornerRadius: 15,
+          curve: 'cardinal',
+          htmlLabels: true
+        }
+      });
+    });
+  </script>
+
+  <style>
+    :root {
+      --main-color: #4CAF50;
+      --accent-1: #9575CD;
+      --accent-2: #FFC107;
+      --accent-3: #009688;
+      --accent-4: #E91E63;
+      --bg-color: #FAFAFA;
+      --text-dark: #2E2E2E;
+      --shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      line-height: 1.6;
+      color: var(--text-dark);
+      background: linear-gradient(135deg, var(--bg-color) 0%, #f0f0f0 100%);
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, var(--main-color) 0%, var(--accent-3) 100%);
+      color: white;
+      padding: 40px 30px;
+      text-align: center;
+      position: relative;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="80" r="1" fill="rgba(255,255,255,0.1)"/></svg>');
+      pointer-events: none;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .header p {
+      font-size: 1.2rem;
+      opacity: 0.9;
+      position: relative;
+      z-index: 1;
+    }
+
+    .content {
+      padding: 30px;
+    }
+
+    .section {
+      margin-bottom: 50px;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      border-left: 5px solid var(--main-color);
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid var(--accent-3);
+    }
+
+    .section-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 20px;
+      font-size: 1.8rem;
+      color: white;
+      font-weight: bold;
+    }
+
+    .icon-setup { background: var(--main-color); }
+    .icon-code { background: var(--accent-1); }
+    .icon-automation { background: var(--accent-2); color: var(--text-dark); }
+    .icon-test { background: var(--accent-3); }
+    .icon-error { background: var(--accent-4); }
+
+    .section h2 {
+      font-size: 1.8rem;
+      color: var(--text-dark);
+    }
+
+    .step-container {
+      background: var(--bg-color);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+      border-left: 4px solid var(--accent-2);
+    }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .step-number {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--accent-2);
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      margin-right: 15px;
+    }
+
+    .step-title {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: var(--text-dark);
+    }
+
+    .action-box {
+      background: white;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 10px 0;
+      border: 2px solid var(--accent-3);
+      position: relative;
+    }
+
+    .action-box::before {
+      content: '👆';
+      position: absolute;
+      left: -15px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: white;
+      padding: 5px;
+      border-radius: 50%;
+      box-shadow: var(--shadow);
+    }
+
+    .button-highlight {
+      background: var(--main-color);
+      color: white;
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-weight: bold;
+      display: inline-block;
+      margin: 5px;
+      box-shadow: var(--shadow);
+    }
+
+    .warning-box {
+      background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+      border: 2px solid var(--accent-2);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 15px 0;
+      position: relative;
+    }
+
+    .warning-box::before {
+      content: '⚠️';
+      font-size: 1.5rem;
+      position: absolute;
+      left: 15px;
+      top: 15px;
+    }
+
+    .warning-box h4 {
+      color: #856404;
+      margin-left: 40px;
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+    }
+
+    .warning-box p {
+      margin-left: 40px;
+      color: #856404;
+    }
+
+    .error-box {
+      background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+      border: 2px solid var(--accent-4);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 15px 0;
+      position: relative;
+    }
+
+    .error-box::before {
+      content: '❌';
+      font-size: 1.5rem;
+      position: absolute;
+      left: 15px;
+      top: 15px;
+    }
+
+    .error-box h4 {
+      color: #721c24;
+      margin-left: 40px;
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+    }
+
+    .error-box p {
+      margin-left: 40px;
+      color: #721c24;
+    }
+
+    .success-box {
+      background: linear-gradient(135deg, #d1edff 0%, #a8e6cf 100%);
+      border: 2px solid var(--main-color);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 15px 0;
+      position: relative;
+    }
+
+    .success-box::before {
+      content: '✅';
+      font-size: 1.5rem;
+      position: absolute;
+      left: 15px;
+      top: 15px;
+    }
+
+    .success-box h4 {
+      color: #155724;
+      margin-left: 40px;
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+    }
+
+    .success-box p {
+      margin-left: 40px;
+      color: #155724;
+    }
+
+    .code-block {
+      background: #2d3748;
+      color: #e2e8f0;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 15px 0;
+      overflow-x: auto;
+      font-family: 'Courier New', monospace;
+      position: relative;
+    }
+
+    .code-block::before {
+      content: 'コード';
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      background: var(--accent-1);
+      color: white;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+    }
+
+    .mermaid-container {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .location-box {
+      background: linear-gradient(135deg, var(--accent-1) 0%, var(--accent-3) 100%);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+      font-weight: bold;
+    }
+
+    .location-box::before {
+      content: '📍';
+      margin-right: 8px;
+    }
+
+    .tab-sequence {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 15px 0;
+      padding: 15px;
+      background: var(--bg-color);
+      border-radius: 8px;
+    }
+
+    .tab-item {
+      background: var(--main-color);
+      color: white;
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      position: relative;
+    }
+
+    .tab-item:not(:last-child)::after {
+      content: '→';
+      position: absolute;
+      right: -15px;
+      color: var(--main-color);
+      font-weight: bold;
+    }
+
+    .checklist {
+      background: var(--bg-color);
+      padding: 20px;
+      border-radius: 12px;
+      margin: 20px 0;
+    }
+
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      margin: 10px 0;
+      padding: 10px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .checklist-checkbox {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--main-color);
+      border-radius: 4px;
+      margin-right: 15px;
+      position: relative;
+    }
+
+    .checklist-checkbox::before {
+      content: '';
+      position: absolute;
+      left: 2px;
+      top: 2px;
+      right: 2px;
+      bottom: 2px;
+      background: var(--main-color);
+      border-radius: 2px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .checklist-item:hover .checklist-checkbox::before {
+      opacity: 1;
+    }
+
+    .final-result {
+      background: linear-gradient(135deg, var(--main-color) 0%, var(--accent-3) 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    .final-result h3 {
+      font-size: 2rem;
+      margin-bottom: 15px;
+    }
+
+    .final-result p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        margin: 10px;
+        border-radius: 15px;
+      }
+      
+      .header h1 {
+        font-size: 2rem;
+      }
+      
+      .content {
+        padding: 20px;
+      }
+      
+      .section {
+        padding: 20px;
+      }
+      
+      .tab-sequence {
+        flex-direction: column;
+      }
+      
+      .tab-item:not(:last-child)::after {
+        content: '↓';
+        position: static;
+        display: block;
+        text-align: center;
+        margin: 5px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🚀 GitHub Pages + GitHub Actions</h1>
+      <p>HTMLファイル自動インデックス生成システム 完全攻略ガイド</p>
+    </div>
+
+    <div class="content">
+      <!-- システム概要セクション -->
+      <div class="section">
+        <div class="section-title">
+          <div class="section-icon icon-setup">📋</div>
+          <h2>システム全体概要</h2>
+        </div>
+        
+        <div class="success-box">
+          <h4>🎯 最終ゴール</h4>
+          <p>HTMLファイルをGitHubに追加するだけで、自動的にインデックスページが更新され、Web上で公開される仕組みを作る</p>
+        </div>
+
+        <div class="mermaid-container">
+          <div class="mermaid">
+            graph TD
+              A[📁 HTMLファイルを追加] --> B[🤖 GitHub Actions起動]
+              B --> C[⚙️ generate_index.js実行]
+              C --> D[📄 index.html自動生成]
+              D --> E[🔄 GitHubに自動コミット]
+              E --> F[🌐 GitHub Pagesで公開]
+              F --> G[✨ 誰でも閲覧可能]
+              
+              style A fill:#FFC107,stroke:#333,color:#000
+              style B fill:#9575CD,stroke:#333,color:#fff
+              style C fill:#4CAF50,stroke:#333,color:#fff
+              style D fill:#009688,stroke:#333,color:#fff
+              style E fill:#E91E63,stroke:#333,color:#fff
+              style F fill:#4CAF50,stroke:#333,color:#fff
+              style G fill:#FFC107,stroke:#333,color:#000
+          </div>
+        </div>
+
+        <div class="mermaid-container">
+          <h4>📂 必要なファイル構成</h4>
+          <div class="mermaid">
+            graph TD
+              ROOT[📁 リポジトリ ルート] --> A[📄 package.json]
+              ROOT --> B[📄 generate_index.js]
+              ROOT --> C[📄 index.html <em>自動生成</em>]
+              ROOT --> D[📁 .github]
+              ROOT --> E[📄 *.html <em>追加するファイル</em>]
+              
+              D --> F[📁 workflows]
+              F --> G[📄 generate-index.yml]
+              
+              style ROOT fill:#4CAF50,stroke:#333,color:#fff
+              style A fill:#FFC107,stroke:#333,color:#000
+              style B fill:#9575CD,stroke:#333,color:#fff
+              style C fill:#009688,stroke:#333,color:#fff
+              style D fill:#E91E63,stroke:#333,color:#fff
+              style E fill:#FFC107,stroke:#333,color:#000
+              style F fill:#E91E63,stroke:#333,color:#fff
+              style G fill:#9575CD,stroke:#333,color:#fff
+          </div>
+        </div>
+      </div>
+
+      <!-- 段階1: リポジトリ設定 -->
+      <div class="section">
+        <div class="section-title">
+          <div class="section-icon icon-setup">🏗️</div>
+          <h2>段階1: リポジトリ設定</h2>
+        </div>
+
+        <div class="step-container">
+          <div class="step-header">
+            <div class="step-number">1</div>
+            <div class="step-title">GitHubにログイン・リポジトリ作成</div>
+          </div>
+
+          <div class="location-box">画面: GitHubトップページ (https://github.com)</div>
+
+          <div class="action-box">
+            <strong>右上の自分のアイコンが表示されているか確認</strong><br>
+            表示されていない場合は <span class="button-highlight">Sign in</span> をクリック
+          </div>
+
+          <div class="action-box">
+            <strong>新しいリポジトリを作成</strong><br>
+            左上の <span class="button-highlight">New</span> ボタンをクリック
+          </div>
+
+          <div class="action-box">
+            <strong>Repository nameを入力</strong><br>
+            例: <code>test</code> または <code>my-html-pages</code>
+          </div>
+
+          <div class="warning-box">
+            <h4>重要：Public設定必須</h4>
+            <p>必ず「Public」を選択してください。Privateだと無料でGitHub Pagesが使えません。</p>
+          </div>
+
+          <div class="action-box">
+            <span class="button-highlight">Create repository</span> をクリック
+          </div>
+        </div>
+
+        <div class="step-container">
+          <div class="step-header">
+            <div class="step-number">2</div>
+            <div class="step-title">GitHub Pages有効化</div>
+          </div>
+
+          <div class="location-box">画面: 作成されたリポジトリのトップページ</div>
+
+          <div class="tab-sequence">
+            <div class="tab-item">Code</div>
+            <div class="tab-item">Issues</div>
+            <div class="tab-item">Pull requests</div>
+            <div class="tab-item">⚙️ Settings</div>
+          </div>
+
+          <div class="action-box">
+            <strong>Settingsタブをクリック</strong><br>
+            ページ上部のタブメニューの右側にある⚙️アイコン付きのタブ
+          </div>
+
+          <div class="action-box">
+            <strong>左サイドバーの「Pages」をクリック</strong><br>
+            「Code and automation」セクション内。見つからない場合は下にスクロール
+          </div>
+
+          <div class="action-box">
+            <strong>Source設定を変更</strong><br>
+            現在「None」になっているドロップダウンを<br>
+            <span class="button-highlight">Deploy from a branch</span> に変更
+          </div>
+
+          <div class="action-box">
+            <strong>Branch設定</strong><br>
+            Branch: <span class="button-highlight">main</span><br>
+            Folder: <span class="button-highlight">/ (root)</span>
+          </div>
+
+          <div class="action-box">
+            <span class="button-highlight">Save</span> をクリック
+          </div>
+
+          <div class="success-box">
+            <h4>設定完了</h4>
+            <p>https://ユーザー名.github.io/リポジトリ名/ のURLが発行されます</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 段階2: ファイル作成 -->
+      <div class="section">
+        <div class="section-title">
+          <div class="section-icon icon-code">📄</div>
+          <h2>段階2: 基本ファイル作成</h2>
+        </div>
+
+        <div class="step-container">
+          <div class="step-header">
+            <div class="step-number">3</div>
+            <div class="step-title">package.json作成</div>
+          </div>
+
+          <div class="location-box">画面: リポジトリのトップページ（Codeタブ）</div>
+
+          <div class="action-box">
+            <strong>ファイル追加開始</strong><br>
+            <span class="button-highlight">Add file</span> → <span class="button-highlight">Create new file</span>
+          </div>
+
+          <div class="action-box">
+            <strong>ファイル名入力</strong><br>
+            正確に: <code>package.json</code>
+          </div>
+
+          <div class="code-block">
+{
+  "name": "html-index-generator",
+  "version": "1.0.0",
+  "description": "自動でindex.htmlを生成する",
+  "main": "generate_index.js",
+  "scripts": {
+    "generate": "node generate_index.js"
+  },
+  "author": "あなたの名前",
+  "license": "MIT"
+}
+          </div>
+
+          <div class="action-box">
+            <span class="button-highlight">Commit new file</span> をクリック
+          </div>
+        </div>
+
+        <div class="step-container">
+          <div class="step-header">
+            <div class="step-number">4</div>
+            <div class="step-title">generate_index.js作成</div>
+          </div>
+
+          <div class="action-box">
+            <strong>再度ファイル作成</strong><br>
+            <span class="button-highlight">Add file</span> → <span class="button-highlight">Create new file</span>
+          </div>
+
+          <div class="action-box">
+            <strong>ファイル名入力</strong><br>
+            正確に: <code>generate_index.js</code>
+          </div>
+
+          <div class="code-block">
+const fs = require("fs");
+const path = require("path");
+
+const outputFile = path.join(__dirname, "index.html");
+const files = fs.readdirSync(__dirname).filter(file =>
+  file.endsWith(".html") && file !== "index.html"
+);
+
+// 日本語・スペース対応版
+const html = `&lt;!DOCTYPE html&gt;
+&lt;html lang="ja"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;📘 HTMLメモ一覧（自動生成）&lt;/title&gt;
+  &lt;style&gt;
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    ul { list-style-type: none; padding: 0; }
+    li { margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+    a { text-decoration: none; color: #0066cc; font-weight: bold; }
+    a:hover { color: #004499; }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;📘 HTMLメモ一覧（自動生成）&lt;/h1&gt;
+  &lt;p&gt;総ファイル数: ${files.length}件&lt;/p&gt;
+  &lt;ul&gt;
+    ${files.map(file =&gt; {
+      // 日本語・スペース・特殊文字対応
+      const encodedFile = encodeURI(file);
+      return `&lt;li&gt;&lt;a href="${encodedFile}"&gt;📄 ${file}&lt;/a&gt;&lt;/li&gt;`;
+    }).join("\n    ")}
+  &lt;/ul&gt;
+&lt;/body&gt;
+&lt;/html&gt;`;
+
+fs.writeFileSync(outputFile, html);
+console.log(`✅ index.html generated with ${files.length} entries.`);
+console.log("📋 処理されたファイル:", files);
+          </div>
+
+          <div class="error-box">
+            <h4>⚠️ 超重要な注意点</h4>
+            <p>最後の行は console.log(`✅ index.html...`) でバックスラッシュ（\）は絶対に入れないこと！</p>
+          </div>
+
+          <div class="action-box">
+            <span class="button-highlight">Commit new file</span> をクリック
+          </div>
+        </div>
+      </div>
+
+      <!-- 段階3: GitHub Actions設定 -->
+      <div class="section">
+        <div class="section-title">
+          <div class="section-icon icon-automation">🤖</div>
+          <h2>段階3: GitHub Actions設定（自動化の核心）</h2>
+        </div>
+
+        <div class="step-container">
+          <div class="step-header">
+            <div class="step-number">5</div>
+            <div class="step-title">ワークフローファイル作成</div>
+          </div>
+
+          <div class="action-box">
+            <strong>特殊なフォルダ＋ファイル作成</strong><br>
+            <span class="button-highlight">Add file</span> → <span class="button-highlight">Create new file</span>
+          </div>
+
+          <div class="action-box">
+            <strong>特殊なファイル名入力</strong><br>
+            正確に: <code>.github/workflows/generate-index.yml</code><br>
+            スラッシュ（/）を入力すると自動でフォルダが作られます
+          </div>
+
+          <div class="code-block">
+name: Update index.html automatically
+
+on:
+  push:
+    paths:
+      - '*.html'
+      - 'generate_index.js'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # 🔑 重要：書き込み権限
+
+    steps:
+      - name: チェックアウト
+        uses: actions/checkout@v3
+
+      - name: Node.js をセットアップ
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: generate_index.js を実行して index.html を再生成
+        run: node generate_index.js
+
+      - name: index.html をコミット＆push
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m '🔁 auto-generate index.html' || echo "No changes to commit"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          </div>
+
+          <div class="action-box">
+            <span class="button-highlight">Commit new file</span> をクリック
+          </div>
+        </div>
+
+        <div class="step-container">
+          <div class="step-header">
+            <div class="step-number">6</div>
+            <div class="step-title">Actions権限設定（重要！）</div>
+          </div>
+
+          <div class="tab-sequence">
+            <div class="tab-item">⚙️ Settings</div>
+            <div class="tab-item">Actions</div>
+            <div class="tab-item">General</div>
+          </div>
+
+          <div class="action-box">
+            <strong>Settings → Actions → General を開く</strong><br>
+            左サイドバーの「Security」セクション内の「Actions」をクリック
+          </div>
+
+          <div class="action-box">
+            <strong>Workflow permissions を探す</strong><br>
+            ページを下にスクロールして「Workflow permissions」を見つける
+          </div>
+
+          <div class="action-box">
+            <strong>権限設定を変更</strong><br>
+            <span class="button-highlight">Read and write permissions</span> にチェック<br>
+            （初期設定は「Read repository contents permission」）
+          </div>
+
+          <div class="action-box">
+            <span class="button-highlight">Save</span> をクリック
+          </div>
+
+          <div class="warning-box">
+            <h4>この設定をしないと後でエラーになります！</h4>
+            <p>GitHub Actionsがindex.htmlを自動でコミット・プッシュするために必要な権限です。</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 段階4: 動作テスト -->
+      <div class="section">
+        <div class="section-title">
+          <div class="section-icon icon-test">🧪</div>
+          <h2>段階4: 動作テスト</h2>
+        </div>
+
+        <div class="step-container">
+          <div class="step-header">
+            <div class="step-number">7</div>
+            <div class="step-title">テスト用HTMLファイル作成</div>
+          </div>
+
+          <div class="action-box">
+            <strong>テストファイル作成</strong><br>
+            <span class="button-highlight">Add file</span> → <span class="button-highlight">Create new file</span>
+          </div>
+
+          <div class="action-box">
+            <strong>ファイル名入力（スペース禁止）</strong><br>
+            例: <code>hello.html</code>（スペースやカッコは使わない）
+          </div>
+
+          <div class="code-block">
+&lt;!DOCTYPE html&gt;
+&lt;html lang="ja"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Hello Page&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;こんにちは！これはテストページです&lt;/h1&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+          </div>
+
+          <div class="action-box">
+            <span class="button-highlight">Commit new file</span> をクリック
+          </div>
+        </div>
+
+        <div class="step-container">
+          <div class="step-header">
+            <div class="step-number">8</div>
+            <div class="step-title">GitHub Actions実行確認</div>
+          </div>
+
+          <div class="tab-sequence">
+            <div class="tab-item">📦 Actions</div>
+          </div>
+
+          <div class="action-box">
+            <strong>Actionsタブを開く</strong><br>
+            ページ上部のタブメニューの「Actions」をクリック
+          </div>
+
+          <div class="mermaid-container">
+            <h4>📊 実行状況の確認方法</h4>
+            <div class="mermaid">
+              graph LR
+                A[🟡 In Progress<br/>実行中] --> B{成功？}
+                B -->|Yes| C[✅ Success<br/>成功]
+                B -->|No| D[❌ Failed<br/>失敗]
+                
+                C --> E[🎉 index.html<br/>自動更新完了]
+                D --> F[🔍 ログ確認<br/>エラー対処]
+                
+                style A fill:#FFC107,stroke:#333,color:#000
+                style C fill:#4CAF50,stroke:#333,color:#fff
+                style D fill:#E91E63,stroke:#333,color:#fff
+                style E fill:#009688,stroke:#333,color:#fff
+                style F fill:#9575CD,stroke:#333,color:#fff
+            </div>
+          </div>
+
+          <div class="action-box">
+            <strong>実行状況確認</strong><br>
+            🟡 黄色い丸 = 実行中<br>
+            ✅ 緑色のチェック = 成功<br>
+            ❌ 赤色のX = 失敗
+          </div>
+
+          <div class="action-box">
+            <strong>成功するまで待つ</strong><br>
+            通常1-2分で完了。ページを更新（F5キー）して確認
+          </div>
+        </div>
+
+        <div class="step-container">
+          <div class="step-header">
+            <div class="step-number">9</div>
+            <div class="step-title">最終確認</div>
+          </div>
+
+          <div class="action-box">
+            <strong>Codeタブで確認</strong><br>
+            index.htmlがファイル一覧に追加されているかチェック
+          </div>
+
+          <div class="action-box">
+            <strong>GitHub Pagesで表示確認</strong><br>
+            ブラウザで https://ユーザー名.github.io/リポジトリ名/ にアクセス
+          </div>
+
+          <div class="success-box">
+            <h4>🎉 成功の確認項目</h4>
+            <p>
+              ✅ index.htmlにhello.htmlのリンクが表示される<br>
+              ✅ リンクをクリックするとテストページが開く<br>
+              ✅ 今後HTMLファイルを追加すると自動で反映される
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 日本語・スペース対応セクション -->
+      <div class="section">
+        <div class="section-title">
+          <div class="section-icon icon-test">🌏</div>
+          <h2>段階5: 日本語・スペース対応（アップグレード）</h2>
+        </div>
+
+        <div class="success-box">
+          <h4>🎉 対応済み機能</h4>
+          <p>日本語ファイル名、スペース、特殊文字を含むHTMLファイルも正常にリンク生成されます</p>
+        </div>
+
+        <div class="step-container">
+          <div class="step-header">
+            <div class="step-number">10</div>
+            <div class="step-title">対応可能なファイル名の例</div>
+          </div>
+
+          <div class="mermaid-container">
+            <h4>📁 対応できるファイル名の種類</h4>
+            <div class="mermaid">
+              graph TD
+                A[📄 ファイル名の種類] --> B[✅ 英数字]
+                A --> C[✅ 日本語]
+                A --> D[✅ スペース]
+                A --> E[✅ 特殊文字]
+                
+                B --> B1[hello.html]
+                C --> C1[日本語テスト.html]
+                D --> D1[my file name.html]
+                E --> E1[poe-preview_54.html]
+                E --> E2[docker-typing-app.html]
+                
+                style A fill:#4CAF50,stroke:#333,color:#fff
+                style B fill:#FFC107,stroke:#333,color:#000
+                style C fill:#9575CD,stroke:#333,color:#fff
+                style D fill:#009688,stroke:#333,color:#fff
+                style E fill:#E91E63,stroke:#333,color:#fff
+            </div>
+          </div>
+
+          <div class="action-box">
+            <strong>テストファイル例</strong><br>
+            以下のようなファイル名でも正常に動作します：
+            <ul style="margin: 10px 0; padding-left: 20px;">
+              <li><code>ai image generation seminar summary.html</code></li>
+              <li><code>poe-preview (54).html</code></li>
+              <li><code>学習メモ 2024.html</code></li>
+              <li><code>JavaScript入門①.html</code></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="step-container">
+          <div class="step-header">
+            <div class="step-number">11</div>
+            <div class="step-title">URLエンコードの仕組み</div>
+          </div>
+
+          <div class="mermaid-container">
+            <h4>🔄 ファイル名→URL変換の流れ</h4>
+            <div class="mermaid">
+              graph LR
+                A[📄 poe-preview 54.html] --> B[🔄 encodeURI 処理]
+                B --> C[🌐 poe-preview%2054.html]
+                C --> D[✅ ブラウザで正常表示]
+                
+                E[📄 学習メモ.html] --> F[🔄 encodeURI 処理]
+                F --> G[🌐 %E5%AD%A6%E7%BF%92%E3%83%A1%E3%83%A2.html]
+                G --> H[✅ ブラウザで正常表示]
+                
+                style A fill:#FFC107,stroke:#333,color:#000
+                style B fill:#9575CD,stroke:#333,color:#fff
+                style C fill:#009688,stroke:#333,color:#fff
+                style D fill:#4CAF50,stroke:#333,color:#fff
+                style E fill:#FFC107,stroke:#333,color:#000
+                style F fill:#9575CD,stroke:#333,color:#fff
+                style G fill:#009688,stroke:#333,color:#fff
+                style H fill:#4CAF50,stroke:#333,color:#fff
+            </div>
+          </div>
+
+          <div class="warning-box">
+            <h4>⚠️ 注意：URLの見た目</h4>
+            <p>日本語ファイル名は自動的にURLエンコードされるため、ブラウザのアドレスバーでは英数字の組み合わせで表示されます。これは正常な動作です。</p>
+          </div>
+        </div>
+
+        <div class="step-container">
+          <div class="step-header">
+            <div class="step-number">12</div>
+            <div class="step-title">よくあるつまずきポイントと解決策</div>
+          </div>
+
+          <div class="error-box">
+            <h4>つまずき1: ファイルが追加されても反映されない</h4>
+            <p><strong>症状:</strong> HTMLファイルを追加したが、index.htmlに表示されない</p>
+            <p><strong>原因:</strong> 同じファイル名で上書きした、またはファイルが正しくpushされていない</p>
+            <p><strong>解決策:</strong></p>
+            <p>1. GitHubリポジトリでファイルの存在確認</p>
+            <p>2. 一度ファイルを削除→再アップロード</p>
+            <p>3. Actions タブでワークフロー実行確認</p>
+          </div>
+
+          <div class="error-box">
+            <h4>つまずき2: GitHub ActionsでYAML構文エラー</h4>
+            <p><strong>症状:</strong> "Invalid workflow file" エラー</p>
+            <p><strong>原因:</strong> YAMLファイル内でバッククォート（`）を使用</p>
+            <p><strong>解決策:</strong> name: の部分からバッククォートを削除</p>
+          </div>
+
+          <div class="error-box">
+            <h4>つまずき3: git push で exit code 128</h4>
+            <p><strong>症状:</strong> GitHub Actions内でpushに失敗</p>
+            <p><strong>原因:</strong> 書き込み権限（permissions）が不足</p>
+            <p><strong>解決策:</strong> YAMLファイルに permissions: contents: write を追加</p>
+          </div>
+
+          <div class="success-box">
+            <h4>✅ 解決後の確認方法</h4>
+            <p>1. Actions タブで緑のチェックマーク（✅）を確認</p>
+            <p>2. index.html の更新日時が最新になっている</p>
+            <p>3. GitHub Pages で新しいファイルのリンクが表示される</p>
+            <p>4. リンクをクリックしてページが正常に開く</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- エラー対処セクション -->
+      <div class="section">
+        <div class="section-title">
+          <div class="section-icon icon-error">❌</div>
+          <h2>エラー対処法（画面操作レベル）</h2>
+        </div>
+
+        <div class="mermaid-container">
+          <h4>🔧 エラー診断フローチャート（日本語・スペース対応版）</h4>
+          <div class="mermaid">
+            graph TD
+              A[❌ エラー発生] --> B{どこで？}
+              
+              B -->|Actions| C[Actions タブで確認]
+              B -->|Pages| D[GitHub Pages 404]
+              B -->|ファイル| E[ファイル反映されない]
+              B -->|日本語| F[日本語ファイル名問題]
+              
+              C --> C1[build をクリック]
+              C1 --> C2[YAML構文エラー？]
+              C2 --> C3[permissions不足？]
+              
+              D --> D1[Settings → Pages 確認]
+              D1 --> D2[数分待って再アクセス]
+              
+              E --> E1[ファイル名にスペース？]
+              E1 --> E2[encodeURI対応確認]
+              
+              F --> F1[URLエンコード確認]
+              F1 --> F2[ブラウザで直接アクセス]
+              
+              style A fill:#E91E63,stroke:#333,color:#fff
+              style C2 fill:#FFC107,stroke:#333,color:#000
+              style C3 fill:#9575CD,stroke:#333,color:#fff
+              style D2 fill:#4CAF50,stroke:#333,color:#fff
+              style E2 fill:#009688,stroke:#333,color:#fff
+              style F2 fill:#4CAF50,stroke:#333,color:#fff
+          </div>
+        </div>
+
+        <div class="error-box">
+          <h4>エラー1: GitHub Actions 失敗（exit code 128）</h4>
+          <p><strong>症状:</strong> Actions タブで赤いX表示、git push に失敗</p>
+          <p><strong>対処手順:</strong></p>
+          <p>1. .github/workflows/generate-index.yml を開く</p>
+          <p>2. jobs: build: の下に以下を追加:</p>
+          <div class="code-block" style="font-size: 0.9rem; margin: 10px 0;">
+permissions:
+  contents: write
+          </div>
+          <p>3. ファイルを保存・コミット</p>
+        </div>
+
+        <div class="error-box">
+          <h4>エラー2: YAML構文エラー（Invalid workflow file）</h4>
+          <p><strong>症状:</strong> "You have an error in your yaml syntax" メッセージ</p>
+          <p><strong>原因:</strong> name: フィールドでバッククォート（`）を使用</p>
+          <p><strong>対処手順:</strong></p>
+          <p>❌ 間違い: <code>name: `generate_index.js` を実行</code></p>
+          <p>✅ 正しい: <code>name: generate_index.js を実行</code></p>
+        </div>
+
+        <div class="error-box">
+          <h4>エラー3: 日本語ファイルが反映されない</h4>
+          <p><strong>症状:</strong> 日本語名のHTMLファイルを追加してもindex.htmlに表示されない</p>
+          <p><strong>原因:</strong> 古いgenerate_index.jsでURLエンコード非対応</p>
+          <p><strong>対処手順:</strong></p>
+          <p>1. generate_index.js を新しいバージョンに更新（encodeURI対応版）</p>
+          <p>2. Actions で自動実行させるか、手動でnode generate_index.js を実行</p>
+        </div>
+
+        <div class="warning-box">
+          <h4>注意: ファイル名のベストプラクティス</h4>
+          <p><strong>推奨:</strong> 英数字とハイフン（例: my-learning-note.html）</p>
+          <p><strong>対応済み:</strong> 日本語、スペース、特殊文字も使用可能</p>
+          <p><strong>避けたい:</strong> #、%、&などURL予約文字</p>
+        </div>
+      </div>
+
+      <!-- 最終チェックリスト -->
+      <div class="section">
+        <div class="section-title">
+          <div class="section-icon icon-setup">📋</div>
+          <h2>最終チェックリスト</h2>
+        </div>
+
+        <div class="checklist">
+          <h3>🎯 設定完了の確認項目</h3>
+          <div class="checklist-item">
+            <div class="checklist-checkbox"></div>
+            <span>リポジトリがPublic設定になっている</span>
+          </div>
+          <div class="checklist-item">
+            <div class="checklist-checkbox"></div>
+            <span>GitHub Pages が有効（Settings → Pages）</span>
+          </div>
+          <div class="checklist-item">
+            <div class="checklist-checkbox"></div>
+            <span>package.json が作成済み</span>
+          </div>
+          <div class="checklist-item">
+            <div class="checklist-checkbox"></div>
+            <span>generate_index.js が作成済み（encodeURI対応版）</span>
+          </div>
+          <div class="checklist-item">
+            <div class="checklist-checkbox"></div>
+            <span>.github/workflows/generate-index.yml が作成済み</span>
+          </div>
+          <div class="checklist-item">
+            <div class="checklist-checkbox"></div>
+            <span>Actions の権限が「contents: write」になっている</span>
+          </div>
+          <div class="checklist-item">
+            <div class="checklist-checkbox"></div>
+            <span>テスト用HTMLファイルで動作確認済み</span>
+          </div>
+          <div class="checklist-item">
+            <div class="checklist-checkbox"></div>
+            <span>日本語・スペース入りファイル名でも正常動作確認済み</span>
+          </div>
+        </div>
+
+        <div class="mermaid-container">
+          <h4>🔄 日常的な運用フロー（日本語・スペース対応版）</h4>
+          <div class="mermaid">
+            graph LR
+              A[📝 新しいHTMLファイル作成<br/>日本語・スペースOK] --> B[📤 GitHubにアップロード]
+              B --> C[🤖 GitHub Actions 自動起動]
+              C --> D[⚙️ encodeURI処理]
+              D --> E[🔄 index.html自動更新]
+              E --> F[🌐 GitHub Pagesに反映]
+              F --> G[✨ 世界中からアクセス可能]
+              
+              style A fill:#FFC107,stroke:#333,color:#000
+              style B fill:#9575CD,stroke:#333,color:#fff
+              style C fill:#E91E63,stroke:#333,color:#fff
+              style D fill:#009688,stroke:#333,color:#fff
+              style E fill:#4CAF50,stroke:#333,color:#fff
+              style F fill:#009688,stroke:#333,color:#fff
+              style G fill:#FFC107,stroke:#333,color:#000
+          </div>
+        </div>
+
+        <div class="success-box">
+          <h4>🌟 アップグレード完了！対応できるファイル名</h4>
+          <p>✅ <strong>英数字:</strong> hello-world.html</p>
+          <p>✅ <strong>日本語:</strong> 学習メモ.html</p>
+          <p>✅ <strong>スペース:</strong> my learning note.html</p>
+          <p>✅ <strong>特殊文字:</strong> poe-preview_54.html</p>
+          <p>✅ <strong>括弧:</strong> research (2024).html</p>
+        </div>
+      </div>
+
+      <div class="final-result">
+        <h3>🎉 完成おめでとうございます！</h3>
+        <p>HTMLファイルを追加するだけで自動的にインデックスが更新される、<br>
+        プロフェッショナルなWebサイト管理システムが完成しました！</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
