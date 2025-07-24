@@ -1,24 +1,29 @@
-const fs = require("fs");
-const path = require("path");
+const fs = require('fs');
+const path = require('path');
 
-const outputFile = path.join(__dirname, "index.html");
-const files = fs.readdirSync(__dirname).filter(file =>
-  file.endsWith(".html") && file !== "index.html"
-);
+const files = fs.readdirSync('.');
+const htmlFiles = files.filter(file => path.extname(file) === '.html' && file !== 'index.html');
 
-const html = `<!DOCTYPE html>
+// HTML用のリスト生成（スペースや日本語をURLエンコード）
+const listItems = htmlFiles.map(file => {
+  const encodedHref = encodeURI(file); // ←ここがポイント！
+  return `<li><a href="${encodedHref}">${file}</a></li>`;
+}).join('\n');
+
+const htmlContent = `
+<!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>📘 HTMLメモ一覧（自動生成）</title>
+  <title>HTMLメモ一覧（自動生成）</title>
 </head>
 <body>
   <h1>📘 HTMLメモ一覧（自動生成）</h1>
   <ul>
-    ${files.map(file => `<li><a href="${file}">${file}</a></li>`).join("\n    ")}
+    ${listItems}
   </ul>
 </body>
-</html>`;
+</html>
+`;
 
-fs.writeFileSync(outputFile, html);
-console.log(`✅ index.html generated with ${files.length} entries.`);
+fs.writeFileSync('index.html', htmlContent);
